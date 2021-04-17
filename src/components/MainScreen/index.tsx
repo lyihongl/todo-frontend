@@ -1,11 +1,11 @@
 import React, { createContext, ReactNode, useCallback, useState } from "react";
 import { gql, useQuery, useMutation } from "@apollo/client";
-import { Button } from "@material-ui/core";
+import { Button, Grid } from "@material-ui/core";
 import { lazy, Suspense, useEffect } from "react";
 import TaskItem from "./components/TaskItem";
 import { Screens } from "./constants";
 import * as Interface from "./MainScreen";
-import useStyles from './styles'
+import useStyles from "./styles";
 
 const LoginScreen = lazy(() => import("../LoginScreen"));
 
@@ -25,22 +25,38 @@ const DynamicRender = ({ children }: DynamicRenderProps) => {
 const MainScreen = () => {
   const [screen, setScreen] = useState<Screens>(Screens.Main);
 
-  const classes = useStyles()
+  const classes = useStyles();
 
   const handleLoginClick = useCallback(() => {
     setScreen(Screens.Login);
+  }, [setScreen, Screens]);
+
+  const handleCreateAccountClick = useCallback(() => {
+    setScreen(Screens.CreateAccount);
   }, [setScreen, Screens]);
 
   const renderScreen = (screen: Screens) => {
     switch (screen) {
       case Screens.Main: {
         return (
-          <>
-            <Button onClick={handleLoginClick}>Login</Button>
-          </>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Button onClick={handleLoginClick}>Login</Button>
+            </Grid>
+            <Grid item xs={12}>
+              <Button onClick={handleLoginClick}>Create Account</Button>
+            </Grid>
+          </Grid>
         );
       }
       case Screens.Login: {
+        return (
+          <DynamicRender>
+            <LoginScreen />
+          </DynamicRender>
+        );
+      }
+      case Screens.CreateAccount: {
         return (
           <DynamicRender>
             <LoginScreen />

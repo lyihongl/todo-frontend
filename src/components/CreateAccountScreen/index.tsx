@@ -1,33 +1,19 @@
-import React, {
-  Suspense,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
-import { Button, Grid, TextField } from "@material-ui/core";
-import { gql, useMutation, useSubscription } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
+import { Grid, TextField, Button } from "@material-ui/core";
+import { useState, useContext, useCallback } from "react";
+import { UserStateContext } from "../../App";
+import useUpdateEffect from "../../hooks/useEffectUpdate";
 import { ScreenContext } from "../MainScreen";
 import { Screens } from "../MainScreen/constants";
-import useUpdateEffect from "../../hooks/useEffectUpdate";
-import { UserStateContext } from "../../App";
-// import { ErrorMessage } from "../Types/UserResponse";
-import { LoginResponse } from "../Types/UserResponse";
+import {RegisterUserResponse} from '../Types/UserResponse'
 
-// interface LoginResponse {
-//   login: {
-//     errors: ErrorMessage[];
-//     user: {
-//       id: string;
-//       username: string;
-//       email: string;
-//     };
-//   };
-// }
 
-const GET_USER = gql`
-  mutation Register($username: String!, $password: String!) {
-    login(options: { username: $username, password: $password }) {
+const REGISTER_USER = gql`
+  mutation Register($username: String!, $password: String!, $email: String!) {
+    registerUser(
+      options: { username: $username, password: $password }
+      email: $email
+    ) {
       user {
         id
         username
@@ -41,10 +27,10 @@ const GET_USER = gql`
   }
 `;
 
-const LoginScreen = () => {
+const CreateAccountScreen = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [login, { data }] = useMutation<LoginResponse>(GET_USER);
+  const [login, { data }] = useMutation<RegisterUserResponse>(REGISTER_USER);
 
   const screenContext = useContext(ScreenContext);
   const UserContext = useContext(UserStateContext);
@@ -61,11 +47,11 @@ const LoginScreen = () => {
 
   useUpdateEffect(() => {
     if (data) {
-      if (data.login.errors !== null) {
+      if (data.registerUser.errors !== null) {
         console.log("error");
       } else {
-        // screenContext.setScreen(Screens.Main);
-        // UserContext.setUserid(data.login.user.id);
+        screenContext.setScreen(Screens.Main);
+        UserContext.setUserid(data.registerUser.user.id);
       }
     }
   }, [data]);
@@ -114,4 +100,4 @@ const LoginScreen = () => {
   );
 };
 
-export default LoginScreen;
+export default CreateAccountScreen;
