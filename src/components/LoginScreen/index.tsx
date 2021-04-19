@@ -65,7 +65,7 @@ const LoginScreen = () => {
         console.log("error");
       } else {
         // screenContext.setScreen(Screens.Main);
-        // UserContext.setUserid(data.login.user.id);
+        // UserContext.setUserId(data.login.user.id);
       }
     }
   }, [data]);

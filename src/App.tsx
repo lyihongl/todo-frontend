@@ -48,8 +48,8 @@ type NotificationData = {
 };
 
 // const TEST_SUBSCRIBE = gql`
-//   subscription($userid: String!) {
-//     newNotification(topic: $userid) {
+//   subscription($userId: String!) {
+//     newNotification(topic: $userId) {
 //       name
 //     }
 //   }
@@ -62,30 +62,30 @@ const client = new ApolloClient({
 });
 
 export const UserStateContext = createContext<AppInterfaces.IUserState>({
-  userid: "-1",
-  setUserid: (s: string) => {},
+  userId: "-1",
+  setUserId: (s: string) => {},
 });
 
 function App() {
   const theme = createMuiTheme();
-  const [userid, setUserid] = useState("");
+  const [userId, setUserId] = useState("");
   // const [test, setTest] = useState(false);
   // const { loading, error, data: subData } = useSubscription<NotificationData>(
   //   TEST_SUBSCRIBE,
-  //   { variables: { userid }, client, shouldResubscribe: test }
+  //   { variables: { userId }, client, shouldResubscribe: test }
   // );
   // useEffect(() => {
-  //   console.log(userid);
+  //   console.log(userId);
   //   console.log(client.cache);
   //   setTest(true);
-  // }, [userid]);
+  // }, [userId]);
   // useEffect(() => {
   //   console.log(subData);
   //   setTest(false);
   // }, [subData]);
   return (
     <ThemeProvider theme={theme}>
-      <UserStateContext.Provider value={{ userid, setUserid }}>
+      <UserStateContext.Provider value={{ userId, setUserId }}>
         <ApolloProvider client={client}>
           <MainScreen />
         </ApolloProvider>

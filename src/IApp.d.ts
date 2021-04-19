@@ -1,4 +1,4 @@
 export interface IUserState {
-  userid: string;
-  setUserid: (s: string) => void;
+  userId: string;
+  setUserId: (s: string) => void;
 }
