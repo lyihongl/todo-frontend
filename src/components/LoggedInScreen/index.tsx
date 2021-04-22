@@ -1,7 +1,8 @@
 import { gql, useQuery } from "@apollo/client";
-import { Grid } from "@material-ui/core";
-import React, { useEffect } from "react";
+import { Button, Grid } from "@material-ui/core";
+import React, { useCallback, useEffect, useState } from "react";
 import TaskItem from "./components/TaskItem";
+import AddTaskModal from "./components/AddTaskModal";
 
 const GET_TASKS = gql`
   query {
@@ -9,6 +10,8 @@ const GET_TASKS = gql`
       id
       title
       description
+      time
+      completed
     }
   }
 `;
@@ -17,6 +20,8 @@ type TaskResponseElement = {
   id: number;
   title: string;
   description: string;
+  time: number;
+  completed: boolean;
 };
 
 type TaskResponse = {
@@ -24,17 +29,37 @@ type TaskResponse = {
 };
 
 const LoggedInScreen = () => {
-  const { loading, error, data } = useQuery<TaskResponse>(GET_TASKS);
+  const [open, setOpen] = useState<boolean>(false);
+  const { loading, error, data, refetch } = useQuery<TaskResponse>(GET_TASKS);
+  const handleOpen = () => {
+    setOpen(true);
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
   useEffect(() => {
     console.log(data);
   }, [data]);
 
   return (
-    <Grid container spacing={2}>
+    <Grid container spacing={2} style={{ maxWidth: "70%" }}>
+      <Grid item xs={12}>
+        <Button onClick={handleOpen}>Add Task</Button>
+      </Grid>
+      <AddTaskModal open={open} onClose={handleClose} refetch={refetch} />
       {data &&
         data!.getTasks.map((e) => (
           <Grid item xs={12}>
-            <TaskItem title={e.title} desc={e.description} />
+            <TaskItem
+              title={e.title}
+              desc={e.description}
+              time={e.time}
+              completed={e.completed}
+              id={e.id}
+              refetch={() => {
+                refetch();
+              }}
+            />
           </Grid>
         ))}
     </Grid>

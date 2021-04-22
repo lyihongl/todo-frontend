@@ -44,8 +44,8 @@ const GET_USER = gql`
 const LoginScreen = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  
   const [login, { data }] = useMutation<LoginResponse>(GET_USER);
-
   const screenContext = useContext(ScreenContext);
   const UserContext = useContext(UserStateContext);
 

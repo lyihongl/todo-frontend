@@ -6,6 +6,7 @@ import { Screens } from "./constants";
 import LoggedInScreen from "../LoggedInScreen";
 import * as Interface from "./MainScreen";
 import useStyles from "./styles";
+import Cookies from 'js-cookie'
 
 const LoginScreen = lazy(() => import("../LoginScreen"));
 const CreateAccountScreen = lazy(() => import("../CreateAccountScreen"));
