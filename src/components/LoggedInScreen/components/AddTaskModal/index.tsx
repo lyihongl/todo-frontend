@@ -24,8 +24,8 @@ const useStyles = makeStyles({
 });
 
 const CREATE_TASK = gql`
-  mutation CreateTask($title: String!, $desc: String!, $time: Int!) {
-    createTask(taskInfo: { title: $title, desc: $desc, time: $time })
+  mutation CreateTask($title: String!, $time: Int!) {
+    createTask(taskInfo: { title: $title, time: $time })
   }
 `;
 
@@ -41,12 +41,11 @@ const AddTaskModal = ({
   const classes = useStyles();
   const [title, setTitle] = useState<String>("");
   const [createTask, { data }] = useMutation(CREATE_TASK);
-  const [desc, setDesc] = useState<String>("");
   const [time, setTime] = useState<number | null>(null);
   const [timeUnit, setTimeUnit] = useState<number>(1);
 
   const validateTask = async () => {
-    if (!title || !desc || time === 0 || !time) {
+    if (!title || time === 0 || !time) {
       return;
     } else {
       const totalTime: number = time * timeUnit;
@@ -54,10 +53,12 @@ const AddTaskModal = ({
         await createTask({
           variables: {
             title,
-            desc,
             time: totalTime,
           },
         });
+        setTitle("");
+        setTime(null);
+        setTimeUnit(1);
         onClose();
         refetch();
       } catch (e) {
@@ -68,9 +69,6 @@ const AddTaskModal = ({
 
   const handleTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.currentTarget.value);
-  };
-  const handleDesc = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDesc(e.currentTarget.value);
   };
   const handleTime = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (parseInt(e.currentTarget.value) >= 0) {
@@ -100,16 +98,6 @@ const AddTaskModal = ({
               size="small"
               value={title}
               onChange={handleTitle}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              label="Task description"
-              fullWidth
-              variant="outlined"
-              size="small"
-              value={desc}
-              onChange={handleDesc}
             />
           </Grid>
           <Grid item xs={9}>

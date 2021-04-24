@@ -9,7 +9,6 @@ const GET_TASKS = gql`
     getTasks {
       id
       title
-      description
       time
       completed
     }
@@ -19,7 +18,6 @@ const GET_TASKS = gql`
 type TaskResponseElement = {
   id: number;
   title: string;
-  description: string;
   time: number;
   completed: boolean;
 };
@@ -52,13 +50,10 @@ const LoggedInScreen = () => {
           <Grid item xs={12}>
             <TaskItem
               title={e.title}
-              desc={e.description}
               time={e.time}
               completed={e.completed}
               id={e.id}
-              refetch={() => {
-                refetch();
-              }}
+              refetch={refetch}
             />
           </Grid>
         ))}

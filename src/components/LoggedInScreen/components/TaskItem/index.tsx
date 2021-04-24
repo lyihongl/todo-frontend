@@ -1,6 +1,7 @@
 import { gql, useMutation } from "@apollo/client";
 import { Button, Grid, Paper, makeStyles } from "@material-ui/core";
-import React from "react";
+import React, { useEffect } from "react";
+import useEffectUpdate from "../../../../hooks/useEffectUpdate";
 
 const useStyles = makeStyles({
   root: {
@@ -22,28 +23,41 @@ const COMPLETE_TASK = gql`
     completeTask(taskid: $taskId)
   }
 `;
+const DELETE_TASK = gql`
+  mutation($taskId: Int!) {
+    disableTask(taskid: $taskId)
+  }
+`;
 
 const TaskItem = ({
   title,
-  desc,
   time,
   completed,
   id,
   refetch,
 }: {
   title: string;
-  desc: string;
   time: number;
   completed: boolean;
   id: number;
   refetch: () => void;
 }) => {
   const classes = useStyles();
-  const [completeTask] = useMutation(COMPLETE_TASK);
+  const [completeTask, { loading: mutationLoading }] = useMutation(
+    COMPLETE_TASK
+  );
+  const [deleteTask, { loading: deleteLoading }] = useMutation(DELETE_TASK);
   const handleCompleteTask = () => {
     completeTask({ variables: { taskId: id } });
-    refetch();
   };
+  const handleDeleteTask = () => {
+    deleteTask({ variables: { taskId: id } });
+  };
+  useEffectUpdate(() => {
+    if (!mutationLoading && !deleteLoading) {
+      refetch();
+    }
+  }, [mutationLoading, deleteLoading]);
   return (
     <Paper className={completed ? classes.completed : classes.notCompleted}>
       <Grid justify="flex-end" container spacing={2}>
@@ -66,7 +80,9 @@ const TaskItem = ({
           </Button>
         </Grid>
         <Grid item xs={2}>
-          <Button size="small">Delete</Button>
+          <Button size="small" onClick={handleDeleteTask}>
+            Delete
+          </Button>
         </Grid>
       </Grid>
     </Paper>
