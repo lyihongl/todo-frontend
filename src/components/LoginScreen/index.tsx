@@ -10,9 +10,11 @@ import { gql, useMutation, useSubscription } from "@apollo/client";
 import { ScreenContext } from "../MainScreen";
 import { Screens } from "../MainScreen/constants";
 import useUpdateEffect from "../../hooks/useEffectUpdate";
-import { UserStateContext } from "../../App";
+import { NotificationData, SubContext, UserStateContext } from "../../App";
+import { client } from "../../App";
 // import { ErrorMessage } from "../Types/UserResponse";
 import { LoginResponse } from "../Types/UserResponse";
+import Cookies from "js-cookie";
 
 // interface LoginResponse {
 //   login: {
@@ -44,10 +46,16 @@ const GET_USER = gql`
 const LoginScreen = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  
+
   const [login, { data }] = useMutation<LoginResponse>(GET_USER);
+  // const [jwt, setJwt] = useState("");
   const screenContext = useContext(ScreenContext);
   const UserContext = useContext(UserStateContext);
+  let subContext = useContext(SubContext);
+
+  // subContext = useSubscription<NotificationData>(TEST_SUBSCRIBE, {
+  //   variables: { userId: jwt, client, shouldResubscribe: true },
+  // });
 
   const onLoginClick = () => {
     login({ variables: { username, password } });
@@ -55,6 +63,10 @@ const LoginScreen = () => {
   const onBackClick = () => {
     screenContext.setScreen(Screens.Main);
   };
+  // const { loading, error, data: subData } = useSubscription<NotificationData>(
+  //   TEST_SUBSCRIBE,
+  //   { variables: { userId }, client, shouldResubscribe: test }
+  // );
   // useEffect(() => {
   //   console.log(loading, error, subData);
   // }, [subData]);
@@ -64,7 +76,13 @@ const LoginScreen = () => {
       if (data.login.errors !== null) {
         console.log("error");
       } else {
-        // screenContext.setScreen(Screens.Main);
+        // console.log(Cookies.get("jwt"));
+        const _jwt = Cookies.get("jwt");
+        if (_jwt) {
+          UserContext.setUserId(_jwt);
+          //   setJwt(_jwt);
+        }
+        screenContext.setScreen(Screens.Main);
         // UserContext.setUserId(data.login.user.id);
       }
     }

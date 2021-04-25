@@ -39,23 +39,7 @@ const splitLink = split(
   httpLink
 );
 
-type NotificationData = {
-  newNotification: {
-    name: string;
-    desc?: string;
-    info?: string;
-  };
-};
-
-// const TEST_SUBSCRIBE = gql`
-//   subscription($userId: String!) {
-//     newNotification(topic: $userId) {
-//       name
-//     }
-//   }
-// `;
-
-const client = new ApolloClient({
+export const client = new ApolloClient({
   link: httpLink,
   cache: new InMemoryCache(),
   credentials: "include",
@@ -66,28 +50,70 @@ export const UserStateContext = createContext<AppInterfaces.IUserState>({
   setUserId: (s: string) => {},
 });
 
+export type NotificationData = {
+  newNotification: {
+    name: string;
+    desc?: string;
+    info?: string;
+  };
+};
+
+export const SubContext = createContext<AppInterfaces.ISub<NotificationData>>({
+  data: undefined,
+  error: undefined,
+  loading: false,
+  variables: undefined,
+});
+
+const TEST_SUBSCRIBE = gql`
+  subscription($userId: String!) {
+    newNotification(topic: $userId) {
+      name
+    }
+  }
+`;
+
 function App() {
   const theme = createMuiTheme();
   const [userId, setUserId] = useState("");
+  // let {
+  //   variables,
+  //   loading,
+  //   error,
+  //   data,
+  // }: AppInterfaces.ISub<NotificationData> = {
+  //   loading: false,
+  //   error: undefined,
+  //   data: undefined,
+  //   variables: undefined,
+  // };
+  const { loading, error, data } = useSubscription<NotificationData>(
+    TEST_SUBSCRIBE,
+    {
+      variables: { userId: "1" },
+      client,
+      shouldResubscribe: true,
+      onSubscriptionData: () => {
+        console.log("recieved data");
+      },
+    }
+  );
   // const [test, setTest] = useState(false);
-  // const { loading, error, data: subData } = useSubscription<NotificationData>(
-  //   TEST_SUBSCRIBE,
-  //   { variables: { userId }, client, shouldResubscribe: test }
-  // );
-  // useEffect(() => {
-  //   console.log(userId);
-  //   console.log(client.cache);
-  //   setTest(true);
-  // }, [userId]);
-  // useEffect(() => {
-  //   console.log(subData);
-  //   setTest(false);
-  // }, [subData]);
+  useEffect(() => {
+    console.log(userId);
+    // console.log(client.cache);
+    // setTest(true);
+  }, [userId]);
+  useEffect(() => {
+    console.log("data", data, loading, error);
+  }, [data, loading, error]);
   return (
     <ThemeProvider theme={theme}>
       <UserStateContext.Provider value={{ userId, setUserId }}>
         <ApolloProvider client={client}>
+          {/* <SubContext.Provider value={{ loading, error, data }}> */}
           <MainScreen />
+          {/* </SubContext.Provider> */}
         </ApolloProvider>
       </UserStateContext.Provider>
     </ThemeProvider>
