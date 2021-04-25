@@ -27,7 +27,7 @@ import Cookies from "js-cookie";
 //   };
 // }
 
-const GET_USER = gql`
+export const GET_USER = gql`
   mutation Register($username: String!, $password: String!) {
     login(options: { username: $username, password: $password }) {
       user {
@@ -51,7 +51,7 @@ const LoginScreen = () => {
   // const [jwt, setJwt] = useState("");
   const screenContext = useContext(ScreenContext);
   const UserContext = useContext(UserStateContext);
-  let subContext = useContext(SubContext);
+  // let subContext = useContext(SubContext);
 
   // subContext = useSubscription<NotificationData>(TEST_SUBSCRIBE, {
   //   variables: { userId: jwt, client, shouldResubscribe: true },
@@ -77,11 +77,11 @@ const LoginScreen = () => {
         console.log("error");
       } else {
         // console.log(Cookies.get("jwt"));
-        const _jwt = Cookies.get("jwt");
-        if (_jwt) {
-          UserContext.setUserId(_jwt);
-          //   setJwt(_jwt);
-        }
+        // const _jwt = Cookies.get("jwt");
+        // if (_jwt) {
+        UserContext.setUserId(`${data.login.user.id}`);
+        //   setJwt(_jwt);
+        // }
         screenContext.setScreen(Screens.Main);
         // UserContext.setUserId(data.login.user.id);
       }

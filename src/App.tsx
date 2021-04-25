@@ -7,6 +7,7 @@ import {
   HttpLink,
   InMemoryCache,
   split,
+  useQuery,
   useSubscription,
 } from "@apollo/client";
 import { getMainDefinition } from "@apollo/client/utilities";
@@ -14,6 +15,8 @@ import { WebSocketLink } from "@apollo/client/link/ws";
 import "./App.css";
 import MainScreen from "./components/MainScreen";
 import * as AppInterfaces from "./IApp";
+import Cookies from "js-cookie";
+import { UserResponse } from "./components/Types/UserResponse";
 
 const wsLink = new WebSocketLink({
   uri: "ws://localhost:4000/sub",
@@ -40,7 +43,7 @@ const splitLink = split(
 );
 
 export const client = new ApolloClient({
-  link: httpLink,
+  link: splitLink,
   cache: new InMemoryCache(),
   credentials: "include",
 });
@@ -72,10 +75,37 @@ const TEST_SUBSCRIBE = gql`
     }
   }
 `;
+const CHECK_LOGIN = gql`
+  query {
+    me {
+      user {
+        id
+      }
+    }
+  }
+`;
+
+type LoginCheckResponse = {
+  me: UserResponse | undefined;
+};
 
 function App() {
   const theme = createMuiTheme();
   const [userId, setUserId] = useState("");
+  const {
+    loading: loginCheckLoading,
+    data: loginCheckData,
+  } = useQuery<LoginCheckResponse>(CHECK_LOGIN, {
+    client,
+  });
+  // console.log(loginCheckData);
+  useEffect(() => {
+    console.log(loginCheckLoading, loginCheckData);
+    if (loginCheckData?.me?.user !== undefined) {
+      setUserId(`${loginCheckData.me.user.id}`);
+    }
+  }, [loginCheckLoading, loginCheckData]);
+  // console.log("logincheck", loginCheckData);
   // let {
   //   variables,
   //   loading,
@@ -90,12 +120,9 @@ function App() {
   const { loading, error, data } = useSubscription<NotificationData>(
     TEST_SUBSCRIBE,
     {
-      variables: { userId: "1" },
+      variables: { userId: userId },
       client,
       shouldResubscribe: true,
-      onSubscriptionData: () => {
-        console.log("recieved data");
-      },
     }
   );
   // const [test, setTest] = useState(false);
