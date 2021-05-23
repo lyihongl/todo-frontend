@@ -72,6 +72,8 @@ const TEST_SUBSCRIBE = gql`
   subscription($userId: String!) {
     newNotification(topic: $userId) {
       name
+      info
+      desc
     }
   }
 `;

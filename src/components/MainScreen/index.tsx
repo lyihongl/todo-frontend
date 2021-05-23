@@ -1,4 +1,10 @@
-import React, { createContext, ReactNode, useCallback, useState } from "react";
+import React, {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useState,
+} from "react";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import { Button, Grid } from "@material-ui/core";
 import { lazy, Suspense, useEffect } from "react";
@@ -6,7 +12,8 @@ import { Screens } from "./constants";
 import LoggedInScreen from "../LoggedInScreen";
 import * as Interface from "./MainScreen";
 import useStyles from "./styles";
-import Cookies from 'js-cookie'
+import Cookies from "js-cookie";
+import { UserStateContext } from "../../App";
 
 const LoginScreen = lazy(() => import("../LoginScreen"));
 const CreateAccountScreen = lazy(() => import("../CreateAccountScreen"));
@@ -27,6 +34,7 @@ const DynamicRender = ({ children }: DynamicRenderProps) => {
 
 const MainScreen = () => {
   const [screen, setScreen] = useState<Screens>(Screens.Main);
+  const userContext = useContext(UserStateContext);
 
   const classes = useStyles();
 
@@ -43,15 +51,18 @@ const MainScreen = () => {
       case Screens.Main: {
         return (
           <>
-            <DynamicRender>
-              <LoggedOutScreen
-                handleLoginClick={handleLoginClick}
-                handleCreateAccountClick={handleCreateAccountClick}
-              />
-            </DynamicRender>
-            <DynamicRender>
-              <LoggedInScreen />
-            </DynamicRender>
+            {Cookies.get("jwt") ? (
+              <DynamicRender>
+                <LoggedInScreen />
+              </DynamicRender>
+            ) : (
+              <DynamicRender>
+                <LoggedOutScreen
+                  handleLoginClick={handleLoginClick}
+                  handleCreateAccountClick={handleCreateAccountClick}
+                />
+              </DynamicRender>
+            )}
           </>
         );
       }

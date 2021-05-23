@@ -41,7 +41,7 @@ const AddTaskModal = ({
   const classes = useStyles();
   const [title, setTitle] = useState<String>("");
   const [createTask, { data }] = useMutation(CREATE_TASK);
-  const [time, setTime] = useState<number | null>(null);
+  const [time, setTime] = useState<number | undefined>(undefined);
   const [timeUnit, setTimeUnit] = useState<number>(1);
 
   const validateTask = async () => {
@@ -57,7 +57,7 @@ const AddTaskModal = ({
           },
         });
         setTitle("");
-        setTime(null);
+        setTime(undefined);
         setTimeUnit(1);
         onClose();
         refetch();
@@ -74,7 +74,7 @@ const AddTaskModal = ({
     if (parseInt(e.currentTarget.value) >= 0) {
       setTime(parseInt(e.currentTarget.value));
     } else if (e.currentTarget.value == "") {
-      setTime(null);
+      setTime(undefined);
     }
   };
   const handleTimeUnit = (e: React.ChangeEvent<{ value: unknown }>) => {
